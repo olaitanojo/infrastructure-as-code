@@ -1,6 +1,10 @@
 # GitHub Actions Workflow Fixes
 
-This document outlines the issues identified in the failing GitHub Actions workflow run and the fixes applied.
+This document outlines the issues identified in the failing GitHub Actions workflow runs and the fixes applied.
+
+## Workflow Run Links
+- First Issue: https://github.com/olaitanojo/infrastructure-as-code/actions/runs/17251461866
+- Second Issue: https://github.com/olaitanojo/infrastructure-as-code/actions/runs/17333482258
 
 ## Issues Identified
 
@@ -42,10 +46,23 @@ This document outlines the issues identified in the failing GitHub Actions workf
   - `contents: read`
   - `security-events: write`
 
-### 4. General Process Improvements
+### 4. Missing TLS Provider (Second Issue)
+**Error**: `Terraform exited with code 3` (Second occurrence)
+
+**Root Cause**: Missing TLS provider in EKS module and environment configurations causing validation failures.
+
+**Fix Applied**:
+- Added TLS provider requirement to EKS module (`modules/aws/eks/main.tf`)
+- Added TLS provider to all environment configurations (`dev`, `staging`, `production`)
+- Improved Terraform validation step to be more selective and informative
+- Enhanced error handling for Terraform format checks
+
+### 5. General Process Improvements
 - Added `continue-on-error: true` to prevent security scan failures from stopping the entire pipeline
 - Improved error handling for file existence checks
 - Enhanced workflow structure with proper permission scoping
+- Better Terraform validation logic that only validates directories with complete configurations
+- More informative error messages and validation output
 
 ## Environment Configurations Created
 
