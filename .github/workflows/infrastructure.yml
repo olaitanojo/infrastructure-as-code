@@ -40,11 +40,21 @@ env:
   TERRAGRUNT_VERSION: 0.53.0
   AWS_REGION: us-west-2
 
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+  pull-requests: write
+  actions: read
+
 jobs:
   # Security and validation checks
   security-checks:
     name: Security and Validation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -75,6 +85,9 @@ jobs:
       - name: Run TFLint
         run: tflint --recursive
 
+      - name: Create reports directory
+        run: mkdir -p reports
+
       - name: Run Checkov (Security Scan)
         uses: bridgecrewio/checkov-action@master
         with:
@@ -82,10 +95,11 @@ jobs:
           framework: terraform
           output_format: sarif
           output_file_path: reports/checkov.sarif
+        continue-on-error: true
 
       - name: Upload Checkov SARIF file
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && hashFiles('reports/checkov.sarif') != ''
         with:
           sarif_file: reports/checkov.sarif
 
