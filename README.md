@@ -1,26 +1,159 @@
 # Infrastructure as Code (IaC) Platform
 
+[![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)](https://www.terraform.io/)
+[![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
+[![GCP](https://img.shields.io/badge/GoogleCloud-%234285F4.svg?style=for-the-badge&logo=google-cloud&logoColor=white)](https://cloud.google.com/)
+[![Azure](https://img.shields.io/badge/azure-%230072C6.svg?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/)
+[![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A comprehensive Infrastructure as Code platform demonstrating SRE best practices for cloud infrastructure provisioning, management, and governance across multiple cloud providers.
 
-## 🏗️ Architecture Overview
+## 📋 Table of Contents
+- [🏗️ Architecture](#%EF%B8%8F-architecture)
+- [🚀 Features](#-features)
+- [📁 Project Structure](#-project-structure)
+- [🛠️ Technology Stack](#%EF%B8%8F-technology-stack)
+- [🚀 Quick Start](#-quick-start)
+- [🏗️ Multi-Cloud Examples](#%EF%B8%8F-multi-cloud-examples)
+- [🔒 Security](#-security-considerations)
+- [💰 Cost Optimization](#-cost-optimization)
+- [🤝 Contributing](#-contributing)
 
+## 🏗️ Architecture
+
+### Multi-Cloud Infrastructure Architecture
 ```mermaid
 graph TB
-    Dev[Development Environment] --> Terraform[Terraform Core]
-    Terraform --> AWS[AWS Resources]
-    Terraform --> GCP[GCP Resources]
-    Terraform --> Azure[Azure Resources]
+    subgraph "Development Layer"
+        A1[Developer Workstation]
+        A2[IDE + Terraform]
+        A3[Local Validation]
+        A4[Git Repository]
+    end
     
-    Terraform --> State[Remote State Backend]
-    Terraform --> Policy[Policy as Code]
+    subgraph "CI/CD Pipeline"
+        B1[GitHub Actions]
+        B2[Terraform Plan]
+        B3[Policy Validation]
+        B4[Security Scanning]
+        B5[Cost Analysis]
+    end
     
-    Pipeline[CI/CD Pipeline] --> Validate[Plan & Validate]
-    Pipeline --> Deploy[Apply Changes]
-    Pipeline --> Test[Infrastructure Tests]
+    subgraph "State Management"
+        C1[Terraform Cloud]
+        C2[Remote State Backend]
+        C3[State Locking]
+        C4[Version Control]
+    end
     
-    Monitor[Infrastructure Monitoring] --> Drift[Drift Detection]
-    Monitor --> Cost[Cost Analysis]
-    Monitor --> Compliance[Compliance Scanning]
+    subgraph "Multi-Cloud Deployment"
+        D1[AWS Infrastructure]
+        D2[GCP Infrastructure]
+        D3[Azure Infrastructure]
+        D4[Kubernetes Clusters]
+    end
+    
+    subgraph "Infrastructure Services"
+        E1[Networking & VPC]
+        E2[Compute & Auto-scaling]
+        E3[Storage & Databases]
+        E4[Security & IAM]
+        E5[Monitoring & Logging]
+    end
+    
+    subgraph "Governance & Compliance"
+        F1[Policy as Code]
+        F2[Drift Detection]
+        F3[Compliance Scanning]
+        F4[Cost Monitoring]
+        F5[Resource Tagging]
+    end
+    
+    A1 --> A2
+    A2 --> A3
+    A3 --> A4
+    A4 --> B1
+    
+    B1 --> B2
+    B2 --> B3
+    B3 --> B4
+    B4 --> B5
+    
+    B2 --> C1
+    C1 --> C2
+    C2 --> C3
+    C3 --> C4
+    
+    B5 --> D1
+    B5 --> D2
+    B5 --> D3
+    B5 --> D4
+    
+    D1 --> E1
+    D2 --> E2
+    D3 --> E3
+    D4 --> E4
+    D1 --> E5
+    
+    E1 --> F1
+    E2 --> F2
+    E3 --> F3
+    E4 --> F4
+    E5 --> F5
+```
+
+### Terraform Workflow
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Git as Git Repository
+    participant Pipeline as CI/CD Pipeline
+    participant Terraform as Terraform Cloud
+    participant AWS as AWS
+    participant GCP as Google Cloud
+    participant Azure as Azure
+    
+    Dev->>Git: Push Infrastructure Changes
+    Git->>Pipeline: Trigger Workflow
+    Pipeline->>Pipeline: Validate Syntax
+    Pipeline->>Pipeline: Security Scan
+    Pipeline->>Terraform: Terraform Plan
+    Terraform-->>Pipeline: Plan Results
+    
+    alt Plan Approved
+        Pipeline->>Terraform: Terraform Apply
+        Terraform->>AWS: Provision AWS Resources
+        Terraform->>GCP: Provision GCP Resources
+        Terraform->>Azure: Provision Azure Resources
+        AWS-->>Terraform: Resource Status
+        GCP-->>Terraform: Resource Status
+        Azure-->>Terraform: Resource Status
+        Terraform-->>Pipeline: Apply Complete
+        Pipeline-->>Dev: Deployment Success
+    else Plan Rejected
+        Pipeline-->>Dev: Plan Failed
+    end
+```
+
+### Infrastructure Component Diagram
+```mermaid
+C4Context
+    title Infrastructure as Code Component Diagram
+    
+    Person(developer, "DevOps Engineer", "Manages infrastructure")
+    System(iac, "IaC Platform", "Terraform-based infrastructure management")
+    
+    System_Ext(aws, "AWS Cloud", "Amazon Web Services")
+    System_Ext(gcp, "Google Cloud", "Google Cloud Platform")
+    System_Ext(azure, "Azure Cloud", "Microsoft Azure")
+    System_Ext(k8s, "Kubernetes", "Container Orchestration")
+    
+    Rel(developer, iac, "Manages infrastructure with")
+    Rel(iac, aws, "Provisions resources")
+    Rel(iac, gcp, "Provisions resources")
+    Rel(iac, azure, "Provisions resources")
+    Rel(iac, k8s, "Deploys applications")
 ```
 
 ## 🚀 Features
