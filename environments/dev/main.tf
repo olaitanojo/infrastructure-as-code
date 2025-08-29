@@ -20,6 +20,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.1"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
   }
 
   # Configure remote state backend

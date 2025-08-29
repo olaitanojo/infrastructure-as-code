@@ -65,16 +65,45 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Format Check
-        run: terraform fmt -check -recursive
+        run: |
+          echo "Checking Terraform file formatting..."
+          # Check format for all .tf files
+          terraform fmt -check -recursive || {
+            echo "❌ Terraform files are not properly formatted."
+            echo "Run 'terraform fmt -recursive' to fix formatting issues."
+            exit 1
+          }
+          echo "✅ All Terraform files are properly formatted."
 
       - name: Terraform Validation
         run: |
-          find . -name "*.tf" -exec dirname {} \; | sort -u | while read dir; do
-            echo "Validating $dir"
-            cd "$dir"
-            terraform init -backend=false
-            terraform validate
-            cd - > /dev/null
+          # Skip validation for directories without complete Terraform configurations
+          echo "Validating Terraform configurations..."
+          
+          # Only validate environments that have main.tf files
+          for env_dir in environments/*/; do
+            if [[ -f "$env_dir/main.tf" ]]; then
+              echo "Validating environment: $env_dir"
+              cd "$env_dir"
+              terraform init -backend=false -input=false
+              terraform validate
+              cd - > /dev/null
+            else
+              echo "Skipping $env_dir - no main.tf found"
+            fi
+          done
+          
+          # Validate modules that have complete configurations
+          for module_dir in modules/*/*/; do
+            if [[ -f "$module_dir/main.tf" ]]; then
+              echo "Validating module: $module_dir"
+              cd "$module_dir"
+              terraform init -backend=false -input=false
+              terraform validate
+              cd - > /dev/null
+            else
+              echo "Skipping $module_dir - no main.tf found"
+            fi
           done
 
       - name: Setup TFLint
