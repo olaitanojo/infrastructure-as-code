@@ -106,11 +106,14 @@ resource "aws_eks_cluster" "main" {
     public_access_cidrs     = var.public_access_cidrs
   }
 
-  encryption_config {
-    provider {
-      key_arn = var.kms_key_arn
+  dynamic "encryption_config" {
+    for_each = var.kms_key_arn != null ? [1] : []
+    content {
+      provider {
+        key_arn = var.kms_key_arn
+      }
+      resources = ["secrets"]
     }
-    resources = ["secrets"]
   }
 
   enabled_cluster_log_types = var.cluster_log_types
@@ -128,7 +131,7 @@ resource "aws_eks_cluster" "main" {
 resource "aws_cloudwatch_log_group" "cluster" {
   name              = "/aws/eks/${var.cluster_name}/cluster"
   retention_in_days = var.log_retention_in_days
-  kms_key_id        = var.kms_key_arn
+  kms_key_id        = var.kms_key_arn != null ? var.kms_key_arn : null
 
   tags = var.tags
 }
@@ -201,10 +204,10 @@ resource "aws_eks_node_group" "main" {
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = var.private_subnet_ids
 
-  capacity_type  = each.value.capacity_type
+  capacity_type  = lookup(each.value, "capacity_type", "ON_DEMAND")
   instance_types = each.value.instance_types
-  ami_type       = each.value.ami_type
-  disk_size      = each.value.disk_size
+  ami_type       = lookup(each.value, "ami_type", "AL2_x86_64")
+  disk_size      = lookup(each.value, "disk_size", 100)
 
   scaling_config {
     desired_size = each.value.desired_size
@@ -213,15 +216,15 @@ resource "aws_eks_node_group" "main" {
   }
 
   update_config {
-    max_unavailable_percentage = each.value.max_unavailable_percentage
+    max_unavailable_percentage = lookup(each.value, "max_unavailable_percentage", 25)
   }
 
   # Optional: Remote access configuration
   dynamic "remote_access" {
-    for_each = each.value.key_name != null ? [1] : []
+    for_each = lookup(each.value, "key_name", null) != null ? [1] : []
     content {
-      ec2_ssh_key = each.value.key_name
-      source_security_group_ids = each.value.source_security_group_ids
+      ec2_ssh_key = lookup(each.value, "key_name", null)
+      source_security_group_ids = lookup(each.value, "source_security_group_ids", [])
     }
   }
 
@@ -233,11 +236,11 @@ resource "aws_eks_node_group" "main" {
     aws_iam_role_policy.node_group_additional,
   ]
 
-  labels = merge(each.value.labels, {
+  labels = merge(lookup(each.value, "labels", {}), {
     "node-group" = each.key
   })
 
-  tags = merge(var.tags, each.value.tags, {
+  tags = merge(var.tags, lookup(each.value, "tags", {}), {
     Name = "${var.cluster_name}-${each.key}"
   })
 }
@@ -248,9 +251,9 @@ resource "aws_eks_addon" "main" {
 
   cluster_name             = aws_eks_cluster.main.name
   addon_name               = each.key
-  addon_version            = each.value.version
-  resolve_conflicts        = each.value.resolve_conflicts
-  service_account_role_arn = each.value.service_account_role_arn
+  addon_version            = lookup(each.value, "version", null)
+  resolve_conflicts        = lookup(each.value, "resolve_conflicts", "OVERWRITE")
+  service_account_role_arn = lookup(each.value, "service_account_role_arn", null)
 
   tags = var.tags
 
