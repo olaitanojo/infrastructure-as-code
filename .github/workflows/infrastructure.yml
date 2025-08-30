@@ -316,7 +316,7 @@ jobs:
 
   # Destroy infrastructure (manual only, with extra protection)
   terraform-destroy:
-    name: Terraform Destroy (${{ github.event.inputs.environment }})
+    name: Terraform Destroy
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
     environment: 
