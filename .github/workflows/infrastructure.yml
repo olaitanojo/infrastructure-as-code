@@ -76,14 +76,14 @@ jobs:
           
           # Run format check and capture detailed output
           if terraform fmt -check -recursive -diff; then
-            echo "✅ All Terraform files are properly formatted." >> $GITHUB_STEP_SUMMARY
+            echo "SUCCESS: All Terraform files are properly formatted." >> $GITHUB_STEP_SUMMARY
           else
-            echo "⚠️ Some Terraform files need formatting." >> $GITHUB_STEP_SUMMARY
+            echo "INFO: Some Terraform files need formatting." >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### Files that need formatting:" >> $GITHUB_STEP_SUMMARY
             terraform fmt -check -recursive -diff | head -50 >> $GITHUB_STEP_SUMMARY || true
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "💡 **Note**: This is informational only. Formatting issues don't block deployment." >> $GITHUB_STEP_SUMMARY
+            echo "NOTE: This is informational only. Formatting issues do not block deployment." >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Terraform Validation
@@ -116,7 +116,7 @@ jobs:
             fi
           done
           
-          echo "✅ Terraform validation completed" >> $GITHUB_STEP_SUMMARY
+          echo "SUCCESS: Terraform validation completed" >> $GITHUB_STEP_SUMMARY
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
@@ -126,7 +126,7 @@ jobs:
       - name: Run TFLint
         run: |
           tflint --recursive
-          echo "✅ TFLint analysis completed" >> $GITHUB_STEP_SUMMARY
+          echo "SUCCESS: TFLint analysis completed" >> $GITHUB_STEP_SUMMARY
         continue-on-error: true
 
       - name: Create reports directory
@@ -231,7 +231,7 @@ jobs:
         run: |
           cd environments/${{ matrix.environment }}
           terraform plan -out=tfplan-${{ matrix.environment }}-${{ github.run_number }}
-          echo "✅ Terraform plan completed for ${{ matrix.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "SUCCESS: Terraform plan completed for ${{ matrix.environment }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload plan artifact
         uses: actions/upload-artifact@v4  # Updated from v3
@@ -329,13 +329,13 @@ jobs:
           CLUSTER_ENDPOINT=$(terraform output -raw cluster_endpoint || echo "")
           echo "cluster_endpoint=$CLUSTER_ENDPOINT" >> $GITHUB_OUTPUT
           
-          echo "✅ Terraform apply completed for ${{ matrix.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "SUCCESS: Terraform apply completed for ${{ matrix.environment }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Post-deployment validation
         run: |
           cd environments/${{ matrix.environment }}
           # Basic validation - can be extended based on your infrastructure
-          echo "✅ Post-deployment validation completed" >> $GITHUB_STEP_SUMMARY
+          echo "SUCCESS: Post-deployment validation completed" >> $GITHUB_STEP_SUMMARY
 
   # Destroy infrastructure (manual only, with extra protection)
   terraform-destroy:
@@ -354,9 +354,9 @@ jobs:
 
       - name: Confirm destruction
         run: |
-          echo "🚨 DESTRUCTIVE ACTION: About to destroy ${{ github.event.inputs.environment }} environment"
+          echo "WARNING: DESTRUCTIVE ACTION - About to destroy ${{ github.event.inputs.environment }} environment"
           echo "This action is irreversible and will remove all infrastructure resources."
-          echo "⚠️ **DESTROY Operation Initiated**" >> $GITHUB_STEP_SUMMARY
+          echo "WARNING: DESTROY Operation Initiated" >> $GITHUB_STEP_SUMMARY
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -379,7 +379,7 @@ jobs:
         run: |
           cd environments/${{ github.event.inputs.environment }}
           terraform destroy -auto-approve
-          echo "💥 Infrastructure destroyed for ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "COMPLETED: Infrastructure destroyed for ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
 
   # Notification on completion
   notify:
