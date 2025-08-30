@@ -44,13 +44,21 @@
 - `.github/workflows/infrastructure.yml` - Fixed notify job dependencies
 - `environments/dev/main.tf` - Fixed deprecated S3 encryption resource
 
-### Fourth Fix (Current Commit 0d42ac6)
+### Fourth Fix (Commit 0d42ac6)
 - `modules/aws/eks/main.tf` - Improved module robustness with proper optional field handling
   - Fixed KMS encryption configuration to be conditional
   - Added proper defaults for node group fields (ami_type, max_unavailable_percentage, etc.)
   - Fixed CloudWatch log group KMS configuration
   - Improved error handling for missing variables
   - Made all optional parameters safe with lookup() functions
+
+### Fifth Fix (Commits cc0d8e0 + dac5b33)
+- `.github/workflows/infrastructure.yml` - Fixed template expression parsing error
+  - Resolved terraform-destroy job name template issue
+  - Made security scanning tools more resilient with continue-on-error
+- `.tflint.hcl` - Added comprehensive TFLint configuration
+  - Configured appropriate rules for infrastructure validation
+  - Disabled overly strict rules for better workflow flow
 
 ## Expected Results
 
