@@ -37,12 +37,20 @@
 - `.github/workflows/infrastructure.yml` - Improved validation logic
 - `WORKFLOW_FIXES.md` - Updated documentation
 
-### Third Fix (Current Commit)
+### Third Fix (Commits 52d23e5 + 0d42ac6)
 - `modules/aws/eks/main.tf` - Created comprehensive EKS module with all resources
 - `modules/aws/eks/variables.tf` - Created module variables with validation
 - `modules/aws/eks/outputs.tf` - Created module outputs for cluster information
 - `.github/workflows/infrastructure.yml` - Fixed notify job dependencies
 - `environments/dev/main.tf` - Fixed deprecated S3 encryption resource
+
+### Fourth Fix (Current Commit 0d42ac6)
+- `modules/aws/eks/main.tf` - Improved module robustness with proper optional field handling
+  - Fixed KMS encryption configuration to be conditional
+  - Added proper defaults for node group fields (ami_type, max_unavailable_percentage, etc.)
+  - Fixed CloudWatch log group KMS configuration
+  - Improved error handling for missing variables
+  - Made all optional parameters safe with lookup() functions
 
 ## Expected Results
 
