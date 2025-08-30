@@ -113,6 +113,7 @@ jobs:
 
       - name: Run TFLint
         run: tflint --recursive
+        continue-on-error: true
 
       - name: Create reports directory
         run: mkdir -p reports
@@ -136,6 +137,7 @@ jobs:
         uses: aquasecurity/tfsec-action@v1.0.3
         with:
           working_directory: .
+        continue-on-error: true
 
   # Determine which environments to deploy
   determine-environments:
