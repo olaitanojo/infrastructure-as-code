@@ -186,7 +186,7 @@ jobs:
 
   # Plan infrastructure changes
   terraform-plan:
-    name: Terraform Plan (${{ matrix.environment }})
+    name: Terraform Plan
     runs-on: ubuntu-latest
     needs: [security-checks, determine-environments]
     timeout-minutes: 30
@@ -265,7 +265,7 @@ jobs:
 
   # Apply infrastructure changes (with environment-specific approvals)
   terraform-apply:
-    name: Terraform Apply (${{ matrix.environment }})
+    name: Terraform Apply
     runs-on: ubuntu-latest
     needs: [terraform-plan, determine-environments]
     if: |
